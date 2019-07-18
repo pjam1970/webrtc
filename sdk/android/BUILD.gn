@@ -46,6 +46,7 @@ if (is_android) {
       ":java_audio_device_module_java",
       ":libjingle_peerconnection_java",
       ":libjingle_peerconnection_metrics_default_java",
+      ":libvpx_h264_java",
       ":libvpx_vp8_java",
       ":libvpx_vp9_java",
       ":logging_java",
@@ -491,6 +492,20 @@ if (is_android) {
     ]
   }
 
+  rtc_android_library("libvpx_h264_java") {
+    visibility = [ "*" ]
+    java_files = [
+      "api/org/webrtc/LibvpxH264Decoder.java",
+      "api/org/webrtc/LibvpxH264Encoder.java",
+    ]
+    deps = [
+      ":base_java",
+      ":video_api_java",
+      ":video_java",
+      "//rtc_base:base_java",
+    ]
+  }
+
   rtc_android_library("libvpx_vp8_java") {
     visibility = [ "*" ]
     java_files = [
@@ -527,6 +542,7 @@ if (is_android) {
 
     deps = [
       ":base_java",
+      ":libvpx_h264_java",
       ":libvpx_vp8_java",
       ":libvpx_vp9_java",
       ":video_api_java",
@@ -808,6 +824,20 @@ if (is_android) {
     ]
   }
 
+  rtc_static_library("libvpx_h264_jni") {
+    visibility = [ "*" ]
+    allow_poison = [ "software_video_codecs" ]
+    sources = [
+      "src/jni/h264_codec.cc",
+    ]
+    deps = [
+      ":base_jni",
+      ":generated_libvpx_h264_jni",
+      ":video_jni",
+      "../../modules/video_coding:webrtc_h264",
+    ]
+  }
+
   rtc_static_library("libvpx_vp8_jni") {
     visibility = [ "*" ]
     allow_poison = [ "software_video_codecs" ]
@@ -838,6 +868,7 @@ if (is_android) {
 
   rtc_static_library("swcodecs_jni") {
     deps = [
+      ":libvpx_h264_jni",
       ":libvpx_vp8_jni",
       ":libvpx_vp9_jni",
     ]
@@ -1286,6 +1317,17 @@ if (is_android) {
       "src/java/org/webrtc/VideoEncoderWrapper.java",
       "src/java/org/webrtc/WrappedNativeI420Buffer.java",
     ]
+    jni_package = ""
+    namespace = "webrtc::jni"
+    jni_generator_include = "//sdk/android/src/jni/jni_generator_helper.h"
+  }
+
+  generate_jni("generated_libvpx_h264_jni") {
+    sources = [
+      "api/org/webrtc/LibvpxH264Decoder.java",
+      "api/org/webrtc/LibvpxH264Encoder.java",
+    ]
+
     jni_package = ""
     namespace = "webrtc::jni"
     jni_generator_include = "//sdk/android/src/jni/jni_generator_helper.h"
